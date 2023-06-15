@@ -407,6 +407,7 @@ def perform_sensitivity_analysis(tb, savedir, parameters_features, parameters_se
         # Linking:
         Track = tobac.linking_trackpy(Features, tb, dt=dt, dxy=dxy, **parameters_linking)
         Track["longitude"] = Track["longitude"] - 360
+        Track.to_hdf(savedir / 'Track_{0}.h5'.format(threshold), 'table')
         
         # Analysis:
         analysis_results = perform_analysis(Features, Features_tb, Mask_tb, Track, parameters_features)
