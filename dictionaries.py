@@ -14,19 +14,20 @@ b = -1.106e-3
 sigma = 5.67e-8 # W m^-2 K^-4
 
 # path for the precipitation data
-precip = '/data/users/hgilmour/total_precip/precip_instant/total_precip_1998_test.nc' 
+precip = '/data/users/hgilmour/total_precip/precip_instant/mi-ba751apq1998.nc' #this is the 1 hourly mean total precip data for all of 1998
 
 # threshold values to be tested in sensitivity analysis
-threshold_values = [225, 230, 235, 240, 241, 245]
+#threshold_values = [225, 230, 235, 240, 241, 245]
+v_max_values=[20,40,60,70,80,100]
 
 # set up the parameters for the dictionaries
 position_threshold = 'weighted_diff'
 sigma_threshold = 0.5
 target = 'minimum'
-threshold = [225]
+threshold = 240
 n_min_threshold = 1975
 method = 'watershed'
-v_max = 60
+v_max = [20]
 stubs = 7
 order = 1
 extrapolate = 0
