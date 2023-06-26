@@ -2,7 +2,7 @@
 data_out=('../')
 
 # data input path
-data_file = '/data/users/hgilmour/olr/olr_1h/olr_merge_1week.nc' #this is the 1 hourly mean olr data for the first 20 days of 1998
+data_file = '/data/users/hgilmour/olr/olr_1h/1998/olr_merge_jan_1998.nc' #this is the 1 hourly mean olr data for the first month of 1998
 
 # set up the parameters to convert from olr to tb
 a = 1.228
@@ -17,15 +17,14 @@ sigma = 5.67e-8 # W m^-2 K^-4
 precip = '/data/users/hgilmour/total_precip/precip_instant/mi-ba751apq1998.nc' #this is the 1 hourly mean total precip data for all of 1998
 
 # threshold values to be tested in sensitivity analysis
-threshold_values = [225, 230, 235, 240, 241, 245]
-#v_max_values=[20,40,60,70,80,100]
+n_min_threshold_values=[118,987,1481,1550,1975,2469]
 
 # set up the parameters for the dictionaries
 position_threshold = 'weighted_diff'
 sigma_threshold = 0.5
 target = 'minimum'
-threshold = [225]
-n_min_threshold = 1975
+threshold = 241
+n_min_threshold = [118]
 method = 'watershed'
 v_max = 60
 stubs = 7
