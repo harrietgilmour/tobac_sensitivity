@@ -415,10 +415,12 @@ def perform_sensitivity_analysis(tb, savedir, parameters_features, parameters_se
         analysis_results = perform_analysis(Features, Features_tb, Mask_tb, Track, parameters_features)
         analysis_results['threshold'] = threshold
         results.append(analysis_results)
+
+        print('finished tracking for {0}K'.format(threshold))
         
     # Save results to file:
     results_df = pd.DataFrame(results)
-    results_df.to_csv(savedir / 'Jan_2005/singleTb/sensitivity_analysis_singleTb.csv', index=False)
+    results_df.to_csv(savedir / 'Jan_1998/sensitivity_analysis_singleTbThreshold.csv', index=False)
     
     return results_df
 
