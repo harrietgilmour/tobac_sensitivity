@@ -17,6 +17,7 @@ import trackpy
 from iris.time import PartialDateTime
 import tobac
 import warnings
+import math
 
 # First set up the function for constraining OLR
 def load_olr_data(data_file):
@@ -338,8 +339,10 @@ def perform_analysis(Features, Features_tb, Mask_tb, Track, parameters_features)
     results['num_tracks'] = len(Track['cell'].dropna().unique()) - 1
     
     # Average lifetime of tracks:
-    lifetime = (tobac.analysis.lifetime_histogram(Track, bin_edges=np.arange(1, 2000, 200), density=False, return_values=True)[3])
-    lifetime_hrs = lifetime / 60
+    cell = Track.groupby("cell")
+    minutes = (cell["time_cell"].max() / pd.Timedelta(minutes=1)).values
+    lifetime = minutes/60 #converting from minutes to hours
+    lifetime_hrs = lifetime[1:] #removes the first large value from the mean and max calculations
     lifetime_mean = lifetime_hrs.mean()
     results['mean_lifetime'] = lifetime_mean
     
@@ -359,6 +362,7 @@ def perform_analysis(Features, Features_tb, Mask_tb, Track, parameters_features)
         ps = np.nanmean(vel[vel.cell== cell].v.values)
         v.append(ps)
     v = np.array(v)
+    v = v[v<math.inf]
     results['mean_velocity'] = v.mean()
     
     # Max velocity of MCSs:
@@ -409,14 +413,12 @@ def perform_sensitivity_analysis(tb, savedir, parameters_features, parameters_se
         # Linking:
         Track = tobac.linking_trackpy(Features, tb, dt=dt, dxy=dxy, **parameters_linking)
         Track["longitude"] = Track["longitude"] - 360
-        Track.to_hdf(savedir / 'Jan_2005/singleTb/Track_{0}.h5'.format(threshold), 'table')
+        Track.to_hdf(savedir / 'Jan_1998/Track_{0}.h5'.format(threshold), 'table')
         
         # Analysis:
         analysis_results = perform_analysis(Features, Features_tb, Mask_tb, Track, parameters_features)
         analysis_results['threshold'] = threshold
         results.append(analysis_results)
-
-        print('finished tracking for {0}K'.format(threshold))
         
     # Save results to file:
     results_df = pd.DataFrame(results)
@@ -492,7 +494,8 @@ def get_v(vel):
     for cell in np.unique(vel.cell.values):
         ps = np.nanmean(vel[vel.cell== cell].v.values)
         v.append(ps)
-    v = np.array(v) 
+    v = np.array(v)
+    v = v[v<math.inf] 
     print('propagation speed histo calculated.')
     return v
 
