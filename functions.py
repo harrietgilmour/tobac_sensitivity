@@ -363,6 +363,8 @@ def perform_analysis(Features, Features_tb, Mask_tb, Track, parameters_features)
         v.append(ps)
     v = np.array(v)
     v = v[v<math.inf]
+    v = v[1:] #removes the one ridiculously large value at the start of each array
+    print(v)
     results['mean_velocity'] = v.mean()
     
     # Max velocity of MCSs:
@@ -581,3 +583,21 @@ def get_area(mcstracks):
 #plt.xticks([40000,80000,120000,160000,200000,240000,280000,320000,360000,400000,440000],fontsize=18)
 #plt.yticks(fontsize=18)
 
+
+
+#function to get an array of MCS lifetimes (from just features that are linked in tracks)
+"""
+    Provides an array of MCS lifetimes for features that are associated with a track. 
+    The function includes the conversion from grid points to area.
+
+    Parameters: 
+    mcstracks (pandas dataframe of tracks)
+    """
+def get_lifetime(mcstracks):
+    cell = Track.groupby("cell")
+    minutes = (cell["time_cell"].max() / pd.Timedelta(minutes=1)).values
+    lifetime = minutes/60 #converting from minutes to hours
+    lifetime_hrs = lifetime[1:] #removes the first large value from the mean and max calculations
+    print('MCS lifetimes generated')
+    return lifetime_hrs
+    

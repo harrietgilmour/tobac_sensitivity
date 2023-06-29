@@ -17,6 +17,7 @@ import trackpy
 from iris.time import PartialDateTime
 import tobac
 import warnings
+import math
 
 # First set up the function for constraining OLR
 def load_olr_data(data_file):
@@ -338,8 +339,10 @@ def perform_analysis(Features, Features_tb, Mask_tb, Track, parameters_features)
     results['num_tracks'] = len(Track['cell'].dropna().unique()) - 1
     
     # Average lifetime of tracks:
-    lifetime = (tobac.analysis.lifetime_histogram(Track, bin_edges=np.arange(1, 2000, 200), density=False, return_values=True)[3])
-    lifetime_hrs = lifetime / 60
+    cell = Track.groupby("cell")
+    minutes = (cell["time_cell"].max() / pd.Timedelta(minutes=1)).values
+    lifetime = minutes/60 #converting from minutes to hours
+    lifetime_hrs = lifetime[1:] #removes the first large value from the mean and max calculations
     lifetime_mean = lifetime_hrs.mean()
     results['mean_lifetime'] = lifetime_mean
     
@@ -359,6 +362,9 @@ def perform_analysis(Features, Features_tb, Mask_tb, Track, parameters_features)
         ps = np.nanmean(vel[vel.cell== cell].v.values)
         v.append(ps)
     v = np.array(v)
+    v = v[v<math.inf]
+    v = v[1:] #removes the one ridiculously large value at the start of each array
+    print(v)
     results['mean_velocity'] = v.mean()
     
     # Max velocity of MCSs:
@@ -370,7 +376,7 @@ def perform_analysis(Features, Features_tb, Mask_tb, Track, parameters_features)
     return results
 
 # Function which performs the sensitivity analysis
-def perform_sensitivity_analysis(tb, savedir, parameters_features, parameters_segmentation, parameters_linking, n_min_threshold_values):
+def perform_sensitivity_analysis(tb, savedir, parameters_features, parameters_segmentation, parameters_linking, threshold_values):
     """
     Performs sensitivity analysis for different values of parameters_features['threshold'] and parameters_segmentation['threshold'].
     
@@ -391,11 +397,12 @@ def perform_sensitivity_analysis(tb, savedir, parameters_features, parameters_se
     
     
     results = []
-    for n_min_threshold in n_min_threshold_values:
+    for threshold in threshold_values:
         # Set up parameters:
         #parameters_linking['vmax'] = threshold
         # Below 2 are for single threshold Tb analysis:
-        parameters_features['n_min_threshold'] = n_min_threshold
+        parameters_features['threshold'] = threshold
+        parameters_segmentation['threshold'] = threshold
 
         dxy, dt = tobac.get_spacings(tb, grid_spacing=4500, time_spacing=3600)
         
@@ -408,16 +415,16 @@ def perform_sensitivity_analysis(tb, savedir, parameters_features, parameters_se
         # Linking:
         Track = tobac.linking_trackpy(Features, tb, dt=dt, dxy=dxy, **parameters_linking)
         Track["longitude"] = Track["longitude"] - 360
-        Track.to_hdf(savedir / 'Jan_1998/n_min_threshold/Track_nmin{0}.h5'.format(n_min_threshold), 'table')
+        Track.to_hdf(savedir / 'Jan_1998/Track_{0}.h5'.format(threshold), 'table')
         
         # Analysis:
         analysis_results = perform_analysis(Features, Features_tb, Mask_tb, Track, parameters_features)
-        analysis_results['n_min_threshold'] = n_min_threshold
+        analysis_results['threshold'] = threshold
         results.append(analysis_results)
         
     # Save results to file:
     results_df = pd.DataFrame(results)
-    results_df.to_csv(savedir / 'Jan_1998/n_min_threshold/sensitivity_analysis_nminthreshold.csv', index=False)
+    results_df.to_csv(savedir / 'Jan_1998/sensitivity_analysis_singleTbThreshold.csv', index=False)
     
     return results_df
 
@@ -489,7 +496,8 @@ def get_v(vel):
     for cell in np.unique(vel.cell.values):
         ps = np.nanmean(vel[vel.cell== cell].v.values)
         v.append(ps)
-    v = np.array(v) 
+    v = np.array(v)
+    v = v[v<math.inf] 
     print('propagation speed histo calculated.')
     return v
 
@@ -575,3 +583,21 @@ def get_area(mcstracks):
 #plt.xticks([40000,80000,120000,160000,200000,240000,280000,320000,360000,400000,440000],fontsize=18)
 #plt.yticks(fontsize=18)
 
+
+
+#function to get an array of MCS lifetimes (from just features that are linked in tracks)
+"""
+    Provides an array of MCS lifetimes for features that are associated with a track. 
+    The function includes the conversion from grid points to area.
+
+    Parameters: 
+    mcstracks (pandas dataframe of tracks)
+    """
+def get_lifetime(mcstracks):
+    cell = Track.groupby("cell")
+    minutes = (cell["time_cell"].max() / pd.Timedelta(minutes=1)).values
+    lifetime = minutes/60 #converting from minutes to hours
+    lifetime_hrs = lifetime[1:] #removes the first large value from the mean and max calculations
+    print('MCS lifetimes generated')
+    return lifetime_hrs
+    
