@@ -377,7 +377,7 @@ def perform_analysis(Features, Features_tb, Mask_tb, Track, parameters_features)
     return results
 
 # Function which performs the sensitivity analysis
-def perform_sensitivity_analysis(tb, savedir, parameters_features, parameters_segmentation, parameters_linking, n_min_threshold_values):
+def perform_sensitivity_analysis(tb, savedir, parameters_features, parameters_segmentation, parameters_linking, threshold_values):
     """
     Performs sensitivity analysis for different values of parameters_features['threshold'] and parameters_segmentation['threshold'].
     
@@ -399,14 +399,16 @@ def perform_sensitivity_analysis(tb, savedir, parameters_features, parameters_se
     
     
     results = []
-    for n_min_threshold in n_min_threshold_values:
+    for threshold in threshold_values:
         # Set up parameters:
         #parameters_linking['vmax'] = threshold
         # Below 2 are for single threshold Tb analysis:
         #parameters_features['threshold'] = threshold
         #parameters_segmentation['threshold'] = threshold
         #Below is for n_min_threshold:
-        parameters_features['n_min_threshold'] = n_min_threshold
+        parameters_features['threshold'] = threshold
+        parameters_segmentation['threshold'] = threshold
+
 
         dxy, dt = tobac.get_spacings(tb, grid_spacing=4500, time_spacing=3600)
         
@@ -419,18 +421,18 @@ def perform_sensitivity_analysis(tb, savedir, parameters_features, parameters_se
         # Linking:
         Track = tobac.linking_trackpy(Features, tb, dt=dt, dxy=dxy, **parameters_linking)
         Track["longitude"] = Track["longitude"] - 360
-        Track.to_hdf(savedir / 'Jan_2005/n_min_threshold/Track_nmin{0}.h5'.format(n_min_threshold), 'table')
+        Track.to_hdf(savedir / 'Jan_2005/singleTb/Track_{0}.h5'.format(threshold), 'table')
         
         # Analysis:
         analysis_results = perform_analysis(Features, Features_tb, Mask_tb, Track, parameters_features)
-        analysis_results['n_min_threshold'] = n_min_threshold
+        analysis_results['threshold'] = threshold
         results.append(analysis_results)
 
-        print('Finished analysis for n_min_threshold = {0}'.format(n_min_threshold))
+        print('Finished analysis for threshold = {0}'.format(threshold))
         
     # Save results to file:
     results_df = pd.DataFrame(results)
-    results_df.to_csv(savedir / 'Jan_2005/n_min_threshold/sensitivity_analysis_nminthreshold.csv', index=False)
+    results_df.to_csv(savedir / 'Jan_2005/singleTb/sensitivity_analysis_singleTbThreshold.csv', index=False)
     
     return results_df
 
