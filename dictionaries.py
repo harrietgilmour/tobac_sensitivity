@@ -2,7 +2,7 @@
 data_out=('../')
 
 # data input path
-data_file = '/data/users/hgilmour/olr/olr_1h/1998/olr_merge_jul_1998.nc' #this is the 1 hourly mean olr data for Jul of 1998 (non-rainy season of el nino year)
+data_file = '/data/users/hgilmour/olr/olr_1h/2000/olr_merge_jan_2000.nc' #this is the 1 hourly mean olr data for Jan 2000 (la nina)
 
 # set up the parameters to convert from olr to tb
 a = 1.228
