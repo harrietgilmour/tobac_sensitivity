@@ -307,6 +307,7 @@ def perform_analysis(Features, Features_tb, Mask_tb, Track, parameters_features)
     Returns:
     dict: A dictionary containing the results of the analysis.
     """
+
     results = {}
     
     # Number of features detected:
@@ -391,6 +392,7 @@ def perform_sensitivity_analysis(tb, savedir, parameters_features, parameters_se
     Returns:
     pandas.DataFrame: A DataFrame containing the results of the analysis for each value of 'threshold'.
     """
+
     savedir = Path(savedir)
     if not savedir.is_dir():
         savedir.mkdir()
@@ -417,16 +419,18 @@ def perform_sensitivity_analysis(tb, savedir, parameters_features, parameters_se
         # Linking:
         Track = tobac.linking_trackpy(Features, tb, dt=dt, dxy=dxy, **parameters_linking)
         Track["longitude"] = Track["longitude"] - 360
-        Track.to_hdf(savedir / 'Jan_1998/n_min_threshold/Track_nmin{0}.h5'.format(n_min_threshold), 'table')
+        Track.to_hdf(savedir / 'Jul_1998/n_min_threshold/Track_nmin{0}.h5'.format(n_min_threshold), 'table')
         
         # Analysis:
         analysis_results = perform_analysis(Features, Features_tb, Mask_tb, Track, parameters_features)
         analysis_results['n_min_threshold'] = n_min_threshold
         results.append(analysis_results)
+
+        print('Finished analysis for n_min_threshold = {0}'.format(n_min_threshold))
         
     # Save results to file:
     results_df = pd.DataFrame(results)
-    results_df.to_csv(savedir / 'Jan_1998/n_min_threshold/sensitivity_analysis_nminthreshold.csv', index=False)
+    results_df.to_csv(savedir / 'Jul_1998/n_min_threshold/sensitivity_analysis_nminthreshold.csv', index=False)
     
     return results_df
 
