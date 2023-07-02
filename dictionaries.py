@@ -2,7 +2,7 @@
 data_out=('../')
 
 # data input path
-data_file = '/data/users/hgilmour/olr/olr_1h/2005/olr_merge_jan_2005.nc' #this is the 1 hourly mean olr data for Jan 2005 (ENSO neutral)
+data_file = '/data/users/hgilmour/olr/olr_1h/2000/olr_merge_jan_2000.nc' #this is the 1 hourly mean olr data for Jan 2005 (ENSO neutral)
 
 # set up the parameters to convert from olr to tb
 a = 1.228

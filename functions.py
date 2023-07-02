@@ -421,7 +421,7 @@ def perform_sensitivity_analysis(tb, savedir, parameters_features, parameters_se
         # Linking:
         Track = tobac.linking_trackpy(Features, tb, dt=dt, dxy=dxy, **parameters_linking)
         Track["longitude"] = Track["longitude"] - 360
-        Track.to_hdf(savedir / 'Jan_2005/singleTb/Track_{0}.h5'.format(threshold), 'table')
+        Track.to_hdf(savedir / 'Jan_2000/singleTb/Track_{0}.h5'.format(threshold), 'table')
         
         # Analysis:
         analysis_results = perform_analysis(Features, Features_tb, Mask_tb, Track, parameters_features)
@@ -432,7 +432,7 @@ def perform_sensitivity_analysis(tb, savedir, parameters_features, parameters_se
         
     # Save results to file:
     results_df = pd.DataFrame(results)
-    results_df.to_csv(savedir / 'Jan_2005/singleTb/sensitivity_analysis_singleTbThreshold.csv', index=False)
+    results_df.to_csv(savedir / 'Jan_2000/singleTb/sensitivity_analysis_singleTbThreshold.csv', index=False)
     
     return results_df
 
