@@ -1,2 +1,6 @@
 Save/cold_core/*.h5
 Save/*.nc
+Save/*/*.nc
+Save/*/*.h5
+*.nc
+*.h5
