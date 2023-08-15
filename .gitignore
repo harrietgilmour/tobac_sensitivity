@@ -4,3 +4,7 @@ Save/*/*.nc
 Save/*/*.h5
 *.nc
 *.h5
+
+*.pyc
+
+Save/.nfs000000057e62676e0000000b
